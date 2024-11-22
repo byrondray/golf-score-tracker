@@ -46,3 +46,16 @@ export const addFriendMutationOptions = {
     return response.json();
   },
 };
+
+export const getFriendByEmailQueryOptions = (email: string) => ({
+  queryKey: ['friend-by-email', email],
+  queryFn: async () => {
+    const response = await api.friends['get-by-email'][':email'].$get({
+      param: { email },
+    });
+    if (!response.ok) {
+      throw new Error('Failed to fetch friend by email');
+    }
+    return response.json();
+  },
+});

@@ -1,6 +1,7 @@
 import { Hono } from 'hono';
 import { getDB } from '../db/client';
 import { friends, FriendInsert } from '../db/schema/friends';
+import { users } from '../db/schema/user';
 import { eq } from 'drizzle-orm';
 import { v4 as uuid } from 'uuid';
 
@@ -52,6 +53,30 @@ const friendsRouter = new Hono()
     } catch (error) {
       console.error('Error fetching friends:', error);
       return c.json({ error: 'Failed to fetch friends' }, 500);
+    }
+  })
+  .get('/get-by-email/:email', async (c) => {
+    const email = c.req.param('email');
+
+    if (!email) {
+      return c.json({ error: 'email is required' }, 400);
+    }
+
+    try {
+      const friendByEmail = await db
+        .select({ user: users })
+        .from(friends)
+        .leftJoin(users, eq(users.id, friends.friendId))
+        .where(eq(users.email, email));
+
+      if (!friendByEmail) {
+        return c.json({ error: 'No friend found with this email' }, 404);
+      }
+
+      return c.json({ success: true, friend: friendByEmail });
+    } catch (error) {
+      console.error('Error fetching friend by email:', error);
+      return c.json({ error: 'Failed to fetch friend by email' }, 500);
     }
   });
 

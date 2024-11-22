@@ -2,21 +2,44 @@ import { Hono } from 'hono';
 import { getDB } from '../db/client';
 import { friends, FriendInsert } from '../db/schema/friends';
 import { users } from '../db/schema/user';
-import { eq } from 'drizzle-orm';
+import { and, eq, or } from 'drizzle-orm';
 import { v4 as uuid } from 'uuid';
 
 const db = getDB();
 
 const friendsRouter = new Hono()
   .post('/add', async (c) => {
-    const body = await c.req.json<{ userId: string; friendId: string }>();
-    const { userId, friendId } = body;
-
-    if (!userId || !friendId) {
-      return c.json({ error: 'userId and friendId are required' }, 400);
-    }
-
     try {
+      const rawBody = await c.req.text();
+
+      const body = JSON.parse(rawBody);
+
+      if (!body || !body.userId || !body.friendId) {
+        return c.json({ error: 'userId and friendId are required' }, 400);
+      }
+
+      const { userId, friendId } = body;
+
+      if (userId === friendId) {
+        return c.json({ error: "You can't add yourself as a friend" }, 400);
+      }
+
+      // Check if the friendship already exists
+      const existingFriendship = await db
+        .select()
+        .from(friends)
+        .where(
+          or(
+            and(eq(friends.userId, userId), eq(friends.friendId, friendId)),
+            and(eq(friends.userId, friendId), eq(friends.friendId, userId))
+          )
+        );
+
+      if (existingFriendship.length > 0) {
+        return c.json({ error: 'Friendship already exists' }, 400);
+      }
+
+      // Add the friendship
       await db.insert(friends).values([
         {
           id: uuid(),
@@ -28,14 +51,19 @@ const friendsRouter = new Hono()
           userId: friendId,
           friendId: userId,
         },
-      ] satisfies FriendInsert[]);
+      ]);
 
       return c.json({ success: true, message: 'Friend added successfully' });
     } catch (error) {
       console.error('Error adding friend:', error);
+
+      if (error instanceof SyntaxError) {
+        return c.json({ error: 'Invalid JSON payload' }, 400);
+      }
       return c.json({ error: 'Failed to add friend' }, 500);
     }
   })
+
   .get('/list/:userId', async (c) => {
     const userId = c.req.param('userId');
 
@@ -45,8 +73,9 @@ const friendsRouter = new Hono()
 
     try {
       const userFriends = await db
-        .select()
+        .select({ friends: users })
         .from(friends)
+        .leftJoin(users, eq(users.id, friends.friendId))
         .where(eq(friends.userId, userId));
 
       return c.json({ success: true, friends: userFriends });
@@ -63,20 +92,20 @@ const friendsRouter = new Hono()
     }
 
     try {
-      const friendByEmail = await db
-        .select({ user: users })
-        .from(friends)
-        .leftJoin(users, eq(users.id, friends.friendId))
+      // Directly search in the `users` table
+      const [user] = await db
+        .select()
+        .from(users)
         .where(eq(users.email, email));
 
-      if (!friendByEmail) {
-        return c.json({ error: 'No friend found with this email' }, 404);
+      if (!user) {
+        return c.json({ error: 'No user found with this email' }, 404);
       }
 
-      return c.json({ success: true, friend: friendByEmail });
+      return c.json({ success: true, user });
     } catch (error) {
-      console.error('Error fetching friend by email:', error);
-      return c.json({ error: 'Failed to fetch friend by email' }, 500);
+      console.error('Error fetching user by email:', error);
+      return c.json({ error: 'Failed to fetch user by email' }, 500);
     }
   });
 

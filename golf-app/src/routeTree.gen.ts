@@ -13,7 +13,9 @@
 import { Route as rootRoute } from './routes/__root'
 import { Route as AuthenticatedImport } from './routes/_authenticated'
 import { Route as AuthenticatedIndexImport } from './routes/_authenticated/index'
+import { Route as AuthenticatedStartRoundImport } from './routes/_authenticated/startRound'
 import { Route as AuthenticatedRoundsImport } from './routes/_authenticated/rounds'
+import { Route as AuthenticatedRoundInProgressImport } from './routes/_authenticated/roundInProgress'
 import { Route as AuthenticatedProfileImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedFriendsImport } from './routes/_authenticated/friends'
 
@@ -30,11 +32,24 @@ const AuthenticatedIndexRoute = AuthenticatedIndexImport.update({
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 
+const AuthenticatedStartRoundRoute = AuthenticatedStartRoundImport.update({
+  id: '/startRound',
+  path: '/startRound',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+
 const AuthenticatedRoundsRoute = AuthenticatedRoundsImport.update({
   id: '/rounds',
   path: '/rounds',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+
+const AuthenticatedRoundInProgressRoute =
+  AuthenticatedRoundInProgressImport.update({
+    id: '/roundInProgress',
+    path: '/roundInProgress',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 
 const AuthenticatedProfileRoute = AuthenticatedProfileImport.update({
   id: '/profile',
@@ -73,11 +88,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProfileImport
       parentRoute: typeof AuthenticatedImport
     }
+    '/_authenticated/roundInProgress': {
+      id: '/_authenticated/roundInProgress'
+      path: '/roundInProgress'
+      fullPath: '/roundInProgress'
+      preLoaderRoute: typeof AuthenticatedRoundInProgressImport
+      parentRoute: typeof AuthenticatedImport
+    }
     '/_authenticated/rounds': {
       id: '/_authenticated/rounds'
       path: '/rounds'
       fullPath: '/rounds'
       preLoaderRoute: typeof AuthenticatedRoundsImport
+      parentRoute: typeof AuthenticatedImport
+    }
+    '/_authenticated/startRound': {
+      id: '/_authenticated/startRound'
+      path: '/startRound'
+      fullPath: '/startRound'
+      preLoaderRoute: typeof AuthenticatedStartRoundImport
       parentRoute: typeof AuthenticatedImport
     }
     '/_authenticated/': {
@@ -95,14 +124,18 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteChildren {
   AuthenticatedFriendsRoute: typeof AuthenticatedFriendsRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
+  AuthenticatedRoundInProgressRoute: typeof AuthenticatedRoundInProgressRoute
   AuthenticatedRoundsRoute: typeof AuthenticatedRoundsRoute
+  AuthenticatedStartRoundRoute: typeof AuthenticatedStartRoundRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedFriendsRoute: AuthenticatedFriendsRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
+  AuthenticatedRoundInProgressRoute: AuthenticatedRoundInProgressRoute,
   AuthenticatedRoundsRoute: AuthenticatedRoundsRoute,
+  AuthenticatedStartRoundRoute: AuthenticatedStartRoundRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
 }
 
@@ -114,14 +147,18 @@ export interface FileRoutesByFullPath {
   '': typeof AuthenticatedRouteWithChildren
   '/friends': typeof AuthenticatedFriendsRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/roundInProgress': typeof AuthenticatedRoundInProgressRoute
   '/rounds': typeof AuthenticatedRoundsRoute
+  '/startRound': typeof AuthenticatedStartRoundRoute
   '/': typeof AuthenticatedIndexRoute
 }
 
 export interface FileRoutesByTo {
   '/friends': typeof AuthenticatedFriendsRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/roundInProgress': typeof AuthenticatedRoundInProgressRoute
   '/rounds': typeof AuthenticatedRoundsRoute
+  '/startRound': typeof AuthenticatedStartRoundRoute
   '/': typeof AuthenticatedIndexRoute
 }
 
@@ -130,21 +167,38 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/_authenticated/friends': typeof AuthenticatedFriendsRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
+  '/_authenticated/roundInProgress': typeof AuthenticatedRoundInProgressRoute
   '/_authenticated/rounds': typeof AuthenticatedRoundsRoute
+  '/_authenticated/startRound': typeof AuthenticatedStartRoundRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '' | '/friends' | '/profile' | '/rounds' | '/'
+  fullPaths:
+    | ''
+    | '/friends'
+    | '/profile'
+    | '/roundInProgress'
+    | '/rounds'
+    | '/startRound'
+    | '/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/friends' | '/profile' | '/rounds' | '/'
+  to:
+    | '/friends'
+    | '/profile'
+    | '/roundInProgress'
+    | '/rounds'
+    | '/startRound'
+    | '/'
   id:
     | '__root__'
     | '/_authenticated'
     | '/_authenticated/friends'
     | '/_authenticated/profile'
+    | '/_authenticated/roundInProgress'
     | '/_authenticated/rounds'
+    | '/_authenticated/startRound'
     | '/_authenticated/'
   fileRoutesById: FileRoutesById
 }
@@ -175,7 +229,9 @@ export const routeTree = rootRoute
       "children": [
         "/_authenticated/friends",
         "/_authenticated/profile",
+        "/_authenticated/roundInProgress",
         "/_authenticated/rounds",
+        "/_authenticated/startRound",
         "/_authenticated/"
       ]
     },
@@ -187,8 +243,16 @@ export const routeTree = rootRoute
       "filePath": "_authenticated/profile.tsx",
       "parent": "/_authenticated"
     },
+    "/_authenticated/roundInProgress": {
+      "filePath": "_authenticated/roundInProgress.tsx",
+      "parent": "/_authenticated"
+    },
     "/_authenticated/rounds": {
       "filePath": "_authenticated/rounds.tsx",
+      "parent": "/_authenticated"
+    },
+    "/_authenticated/startRound": {
+      "filePath": "_authenticated/startRound.tsx",
       "parent": "/_authenticated"
     },
     "/_authenticated/": {

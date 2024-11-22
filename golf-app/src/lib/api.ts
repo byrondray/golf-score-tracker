@@ -38,10 +38,14 @@ export const addFriendMutationOptions = {
     friendId: string;
   }) => {
     const response = await api.friends.add.$post({
-      params: { userId, friendId },
+      json: { userId, friendId },
     });
+
     if (!response.ok) {
-      throw new Error('Failed to add friend');
+      const errorData = await response.json();
+      throw new Error(
+        'error' in errorData ? errorData.error : 'Failed to add friend'
+      );
     }
     return response.json();
   },
@@ -59,3 +63,60 @@ export const getFriendByEmailQueryOptions = (email: string) => ({
     return response.json();
   },
 });
+
+export const roundsQueryOptions = {
+  queryKey: ['rounds'],
+  queryFn: async () => {
+    const response = await api.rounds.list.$get();
+    if (!response.ok) {
+      throw new Error('Failed to fetch rounds');
+    }
+    return response.json();
+  },
+  staleTime: 60000,
+};
+
+export const createRoundMutationOptions = {
+  mutationFn: async ({
+    players,
+  }: {
+    players: string[]; // Array of user IDs
+  }) => {
+    const response = await api.rounds.create.$post({
+      json: { players },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(
+        'error' in errorData ? errorData.error : 'Failed to create round'
+      );
+    }
+    return response.json();
+  },
+};
+
+// Update score for a single user
+export const updateScoreMutationOptions = {
+  mutationFn: async ({
+    roundId,
+    userId,
+    score,
+  }: {
+    roundId: string;
+    userId: string;
+    score: string;
+  }) => {
+    const response = await api.rounds['update-score'].$post({
+      json: { roundId, userId, score },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(
+        'error' in errorData ? errorData.error : 'Failed to update score'
+      );
+    }
+    return response.json();
+  },
+};

@@ -1,6 +1,11 @@
 import { Hono } from 'hono';
 import { kindeClient, sessionManager } from '../kinde';
 import { getUser } from '../kinde';
+import { getDB } from '../db/client';
+import { users } from '../db/schema/user';
+import { eq } from 'drizzle-orm';
+
+const db = getDB();
 
 const auth = new Hono()
   .get('/login', async (c) => {
@@ -22,6 +27,20 @@ const auth = new Hono()
   })
   .get('/me', getUser, async (c) => {
     const user = c.var.user;
+
+    const existingUser = await db
+      .select()
+      .from(users)
+      .where(eq(users.id, user.id));
+
+    if (existingUser.length === 0) {
+      await db.insert(users).values({
+        id: user.id,
+        email: user.email,
+        firstName: user.given_name,
+      });
+    }
+
     return c.json(user);
   });
 

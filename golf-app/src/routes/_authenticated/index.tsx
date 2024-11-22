@@ -13,7 +13,6 @@ export const Route = createFileRoute('/_authenticated/')({
 async function fetchCourse() {
   const c = await client.api.courses.$get()
   const d = await c.json()
-  console.log(d)
 }
 
 function Index() {

@@ -13,7 +13,9 @@
 import { Route as rootRoute } from './routes/__root'
 import { Route as AuthenticatedImport } from './routes/_authenticated'
 import { Route as AuthenticatedIndexImport } from './routes/_authenticated/index'
+import { Route as AuthenticatedRoundsImport } from './routes/_authenticated/rounds'
 import { Route as AuthenticatedProfileImport } from './routes/_authenticated/profile'
+import { Route as AuthenticatedFriendsImport } from './routes/_authenticated/friends'
 
 // Create/Update Routes
 
@@ -28,9 +30,21 @@ const AuthenticatedIndexRoute = AuthenticatedIndexImport.update({
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 
+const AuthenticatedRoundsRoute = AuthenticatedRoundsImport.update({
+  id: '/rounds',
+  path: '/rounds',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+
 const AuthenticatedProfileRoute = AuthenticatedProfileImport.update({
   id: '/profile',
   path: '/profile',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+
+const AuthenticatedFriendsRoute = AuthenticatedFriendsImport.update({
+  id: '/friends',
+  path: '/friends',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 
@@ -45,11 +59,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedImport
       parentRoute: typeof rootRoute
     }
+    '/_authenticated/friends': {
+      id: '/_authenticated/friends'
+      path: '/friends'
+      fullPath: '/friends'
+      preLoaderRoute: typeof AuthenticatedFriendsImport
+      parentRoute: typeof AuthenticatedImport
+    }
     '/_authenticated/profile': {
       id: '/_authenticated/profile'
       path: '/profile'
       fullPath: '/profile'
       preLoaderRoute: typeof AuthenticatedProfileImport
+      parentRoute: typeof AuthenticatedImport
+    }
+    '/_authenticated/rounds': {
+      id: '/_authenticated/rounds'
+      path: '/rounds'
+      fullPath: '/rounds'
+      preLoaderRoute: typeof AuthenticatedRoundsImport
       parentRoute: typeof AuthenticatedImport
     }
     '/_authenticated/': {
@@ -65,12 +93,16 @@ declare module '@tanstack/react-router' {
 // Create and export the route tree
 
 interface AuthenticatedRouteChildren {
+  AuthenticatedFriendsRoute: typeof AuthenticatedFriendsRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
+  AuthenticatedRoundsRoute: typeof AuthenticatedRoundsRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedFriendsRoute: AuthenticatedFriendsRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
+  AuthenticatedRoundsRoute: AuthenticatedRoundsRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
 }
 
@@ -80,31 +112,39 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
 
 export interface FileRoutesByFullPath {
   '': typeof AuthenticatedRouteWithChildren
+  '/friends': typeof AuthenticatedFriendsRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/rounds': typeof AuthenticatedRoundsRoute
   '/': typeof AuthenticatedIndexRoute
 }
 
 export interface FileRoutesByTo {
+  '/friends': typeof AuthenticatedFriendsRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/rounds': typeof AuthenticatedRoundsRoute
   '/': typeof AuthenticatedIndexRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/_authenticated/friends': typeof AuthenticatedFriendsRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
+  '/_authenticated/rounds': typeof AuthenticatedRoundsRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '' | '/profile' | '/'
+  fullPaths: '' | '/friends' | '/profile' | '/rounds' | '/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/profile' | '/'
+  to: '/friends' | '/profile' | '/rounds' | '/'
   id:
     | '__root__'
     | '/_authenticated'
+    | '/_authenticated/friends'
     | '/_authenticated/profile'
+    | '/_authenticated/rounds'
     | '/_authenticated/'
   fileRoutesById: FileRoutesById
 }
@@ -133,12 +173,22 @@ export const routeTree = rootRoute
     "/_authenticated": {
       "filePath": "_authenticated.tsx",
       "children": [
+        "/_authenticated/friends",
         "/_authenticated/profile",
+        "/_authenticated/rounds",
         "/_authenticated/"
       ]
     },
+    "/_authenticated/friends": {
+      "filePath": "_authenticated/friends.tsx",
+      "parent": "/_authenticated"
+    },
     "/_authenticated/profile": {
       "filePath": "_authenticated/profile.tsx",
+      "parent": "/_authenticated"
+    },
+    "/_authenticated/rounds": {
+      "filePath": "_authenticated/rounds.tsx",
       "parent": "/_authenticated"
     },
     "/_authenticated/": {

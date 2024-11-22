@@ -16,7 +16,6 @@ const Component = () => {
   const routeContext = Route.useRouteContext() as { user: any };
   const { user } = routeContext;
 
-  console.log(user, 'user');
   if (!user || !user.id) {
     // Render Login if user is not available or user.id is missing
     return <Login />;

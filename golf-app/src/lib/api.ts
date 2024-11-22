@@ -10,8 +10,39 @@ export const userQueryOptions = queryOptions({
 });
 
 async function fetchProfile() {
-  const c = await client.api.me.$get();
+  const c = await api.me.$get();
   const d = await c.json();
-  console.log(d);
   return d;
 }
+
+export const friendsQueryOptions = (userId: string) => ({
+  queryKey: ['friends', userId],
+  queryFn: async () => {
+    const response = await api.friends.list[':userId'].$get({
+      param: { userId },
+    });
+    if (!response.ok) {
+      throw new Error('Failed to fetch friends');
+    }
+    return response.json();
+  },
+  staleTime: Infinity,
+});
+
+export const addFriendMutationOptions = {
+  mutationFn: async ({
+    userId,
+    friendId,
+  }: {
+    userId: string;
+    friendId: string;
+  }) => {
+    const response = await api.friends.add.$post({
+      params: { userId, friendId },
+    });
+    if (!response.ok) {
+      throw new Error('Failed to add friend');
+    }
+    return response.json();
+  },
+};

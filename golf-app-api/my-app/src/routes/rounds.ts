@@ -48,13 +48,10 @@ const roundRouter = new Hono()
   })
   .get('/list', async (c) => {
     try {
-      // Fetch all rounds
       const roundsData = await db.select().from(rounds);
 
-      // Collect all round IDs
       const roundIds = roundsData.map((round) => round.id);
 
-      // Fetch all players linked to those rounds
       const playersData = await db
         .select({
           roundId: roundToUsers.roundId,
@@ -115,9 +112,27 @@ const roundRouter = new Hono()
 
       const { roundId, userId, score } = body;
 
+      const currentRecord = await db
+        .select({ currentScore: roundToUsers.score })
+        .from(roundToUsers)
+        .where(
+          and(
+            eq(roundToUsers.roundId, roundId),
+            eq(roundToUsers.userId, userId)
+          )
+        )
+        .limit(1);
+
+      if (currentRecord.length === 0) {
+        return c.json({ error: 'No matching record found' }, 404);
+      }
+
+      const currentScore = Number(currentRecord[0].currentScore || 0);
+      const newScore = currentScore + Number(score);
+
       const updatedRows = await db
         .update(roundToUsers)
-        .set({ score })
+        .set({ score: newScore.toString() })
         .where(
           and(
             eq(roundToUsers.roundId, roundId),
@@ -142,6 +157,47 @@ const roundRouter = new Hono()
       }
 
       return c.json({ error: 'Failed to update score' }, 500);
+    }
+  })
+
+  .get('/details/:roundId', async (c) => {
+    try {
+      const roundId = c.req.param('roundId');
+
+      if (!roundId) {
+        return c.json({ error: 'roundId is required' }, 400);
+      }
+
+      const round = await db
+        .select()
+        .from(rounds)
+        .where(eq(rounds.id, roundId))
+        .limit(1);
+
+      if (round.length === 0) {
+        return c.json({ error: 'Round not found' }, 404);
+      }
+
+      const players = await db
+        .select({
+          userId: users.id,
+          firstName: users.firstName,
+          score: roundToUsers.score,
+        })
+        .from(roundToUsers)
+        .innerJoin(users, eq(users.id, roundToUsers.userId))
+        .where(eq(roundToUsers.roundId, roundId));
+
+      const roundDetails = {
+        roundId: round[0].id,
+        createdAt: round[0].createdAt,
+        players,
+      };
+
+      return c.json({ success: true, round: roundDetails });
+    } catch (error) {
+      console.error('Error fetching round details:', error);
+      return c.json({ error: 'Failed to fetch round details' }, 500);
     }
   });
 

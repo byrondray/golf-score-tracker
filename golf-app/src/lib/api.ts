@@ -120,3 +120,19 @@ export const updateScoreMutationOptions = {
     return response.json();
   },
 };
+
+export const roundDetailsQueryOptions = (roundId: string) => ({
+  queryKey: ['round-details', roundId],
+  queryFn: async () => {
+    const response = await api.rounds.details[':roundId'].$get({
+      param: { roundId },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch round details');
+    }
+
+    return response.json();
+  },
+  staleTime: 60000,
+});

@@ -15,9 +15,10 @@ import { Route as AuthenticatedImport } from './routes/_authenticated'
 import { Route as AuthenticatedIndexImport } from './routes/_authenticated/index'
 import { Route as AuthenticatedStartRoundImport } from './routes/_authenticated/startRound'
 import { Route as AuthenticatedRoundsImport } from './routes/_authenticated/rounds'
-import { Route as AuthenticatedRoundInProgressImport } from './routes/_authenticated/roundInProgress'
 import { Route as AuthenticatedProfileImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedFriendsImport } from './routes/_authenticated/friends'
+import { Route as AuthenticatedRoundSummaryRoundIdImport } from './routes/_authenticated/roundSummary/$roundId'
+import { Route as AuthenticatedRoundInProgressRoundIdImport } from './routes/_authenticated/roundInProgress/$roundId'
 
 // Create/Update Routes
 
@@ -44,13 +45,6 @@ const AuthenticatedRoundsRoute = AuthenticatedRoundsImport.update({
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 
-const AuthenticatedRoundInProgressRoute =
-  AuthenticatedRoundInProgressImport.update({
-    id: '/roundInProgress',
-    path: '/roundInProgress',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-
 const AuthenticatedProfileRoute = AuthenticatedProfileImport.update({
   id: '/profile',
   path: '/profile',
@@ -62,6 +56,20 @@ const AuthenticatedFriendsRoute = AuthenticatedFriendsImport.update({
   path: '/friends',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+
+const AuthenticatedRoundSummaryRoundIdRoute =
+  AuthenticatedRoundSummaryRoundIdImport.update({
+    id: '/roundSummary/$roundId',
+    path: '/roundSummary/$roundId',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+
+const AuthenticatedRoundInProgressRoundIdRoute =
+  AuthenticatedRoundInProgressRoundIdImport.update({
+    id: '/roundInProgress/$roundId',
+    path: '/roundInProgress/$roundId',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 
 // Populate the FileRoutesByPath interface
 
@@ -88,13 +96,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProfileImport
       parentRoute: typeof AuthenticatedImport
     }
-    '/_authenticated/roundInProgress': {
-      id: '/_authenticated/roundInProgress'
-      path: '/roundInProgress'
-      fullPath: '/roundInProgress'
-      preLoaderRoute: typeof AuthenticatedRoundInProgressImport
-      parentRoute: typeof AuthenticatedImport
-    }
     '/_authenticated/rounds': {
       id: '/_authenticated/rounds'
       path: '/rounds'
@@ -116,6 +117,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedIndexImport
       parentRoute: typeof AuthenticatedImport
     }
+    '/_authenticated/roundInProgress/$roundId': {
+      id: '/_authenticated/roundInProgress/$roundId'
+      path: '/roundInProgress/$roundId'
+      fullPath: '/roundInProgress/$roundId'
+      preLoaderRoute: typeof AuthenticatedRoundInProgressRoundIdImport
+      parentRoute: typeof AuthenticatedImport
+    }
+    '/_authenticated/roundSummary/$roundId': {
+      id: '/_authenticated/roundSummary/$roundId'
+      path: '/roundSummary/$roundId'
+      fullPath: '/roundSummary/$roundId'
+      preLoaderRoute: typeof AuthenticatedRoundSummaryRoundIdImport
+      parentRoute: typeof AuthenticatedImport
+    }
   }
 }
 
@@ -124,19 +139,22 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteChildren {
   AuthenticatedFriendsRoute: typeof AuthenticatedFriendsRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
-  AuthenticatedRoundInProgressRoute: typeof AuthenticatedRoundInProgressRoute
   AuthenticatedRoundsRoute: typeof AuthenticatedRoundsRoute
   AuthenticatedStartRoundRoute: typeof AuthenticatedStartRoundRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+  AuthenticatedRoundInProgressRoundIdRoute: typeof AuthenticatedRoundInProgressRoundIdRoute
+  AuthenticatedRoundSummaryRoundIdRoute: typeof AuthenticatedRoundSummaryRoundIdRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedFriendsRoute: AuthenticatedFriendsRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
-  AuthenticatedRoundInProgressRoute: AuthenticatedRoundInProgressRoute,
   AuthenticatedRoundsRoute: AuthenticatedRoundsRoute,
   AuthenticatedStartRoundRoute: AuthenticatedStartRoundRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
+  AuthenticatedRoundInProgressRoundIdRoute:
+    AuthenticatedRoundInProgressRoundIdRoute,
+  AuthenticatedRoundSummaryRoundIdRoute: AuthenticatedRoundSummaryRoundIdRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
@@ -147,19 +165,21 @@ export interface FileRoutesByFullPath {
   '': typeof AuthenticatedRouteWithChildren
   '/friends': typeof AuthenticatedFriendsRoute
   '/profile': typeof AuthenticatedProfileRoute
-  '/roundInProgress': typeof AuthenticatedRoundInProgressRoute
   '/rounds': typeof AuthenticatedRoundsRoute
   '/startRound': typeof AuthenticatedStartRoundRoute
   '/': typeof AuthenticatedIndexRoute
+  '/roundInProgress/$roundId': typeof AuthenticatedRoundInProgressRoundIdRoute
+  '/roundSummary/$roundId': typeof AuthenticatedRoundSummaryRoundIdRoute
 }
 
 export interface FileRoutesByTo {
   '/friends': typeof AuthenticatedFriendsRoute
   '/profile': typeof AuthenticatedProfileRoute
-  '/roundInProgress': typeof AuthenticatedRoundInProgressRoute
   '/rounds': typeof AuthenticatedRoundsRoute
   '/startRound': typeof AuthenticatedStartRoundRoute
   '/': typeof AuthenticatedIndexRoute
+  '/roundInProgress/$roundId': typeof AuthenticatedRoundInProgressRoundIdRoute
+  '/roundSummary/$roundId': typeof AuthenticatedRoundSummaryRoundIdRoute
 }
 
 export interface FileRoutesById {
@@ -167,10 +187,11 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/_authenticated/friends': typeof AuthenticatedFriendsRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
-  '/_authenticated/roundInProgress': typeof AuthenticatedRoundInProgressRoute
   '/_authenticated/rounds': typeof AuthenticatedRoundsRoute
   '/_authenticated/startRound': typeof AuthenticatedStartRoundRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
+  '/_authenticated/roundInProgress/$roundId': typeof AuthenticatedRoundInProgressRoundIdRoute
+  '/_authenticated/roundSummary/$roundId': typeof AuthenticatedRoundSummaryRoundIdRoute
 }
 
 export interface FileRouteTypes {
@@ -179,27 +200,30 @@ export interface FileRouteTypes {
     | ''
     | '/friends'
     | '/profile'
-    | '/roundInProgress'
     | '/rounds'
     | '/startRound'
     | '/'
+    | '/roundInProgress/$roundId'
+    | '/roundSummary/$roundId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/friends'
     | '/profile'
-    | '/roundInProgress'
     | '/rounds'
     | '/startRound'
     | '/'
+    | '/roundInProgress/$roundId'
+    | '/roundSummary/$roundId'
   id:
     | '__root__'
     | '/_authenticated'
     | '/_authenticated/friends'
     | '/_authenticated/profile'
-    | '/_authenticated/roundInProgress'
     | '/_authenticated/rounds'
     | '/_authenticated/startRound'
     | '/_authenticated/'
+    | '/_authenticated/roundInProgress/$roundId'
+    | '/_authenticated/roundSummary/$roundId'
   fileRoutesById: FileRoutesById
 }
 
@@ -229,10 +253,11 @@ export const routeTree = rootRoute
       "children": [
         "/_authenticated/friends",
         "/_authenticated/profile",
-        "/_authenticated/roundInProgress",
         "/_authenticated/rounds",
         "/_authenticated/startRound",
-        "/_authenticated/"
+        "/_authenticated/",
+        "/_authenticated/roundInProgress/$roundId",
+        "/_authenticated/roundSummary/$roundId"
       ]
     },
     "/_authenticated/friends": {
@@ -241,10 +266,6 @@ export const routeTree = rootRoute
     },
     "/_authenticated/profile": {
       "filePath": "_authenticated/profile.tsx",
-      "parent": "/_authenticated"
-    },
-    "/_authenticated/roundInProgress": {
-      "filePath": "_authenticated/roundInProgress.tsx",
       "parent": "/_authenticated"
     },
     "/_authenticated/rounds": {
@@ -257,6 +278,14 @@ export const routeTree = rootRoute
     },
     "/_authenticated/": {
       "filePath": "_authenticated/index.tsx",
+      "parent": "/_authenticated"
+    },
+    "/_authenticated/roundInProgress/$roundId": {
+      "filePath": "_authenticated/roundInProgress/$roundId.tsx",
+      "parent": "/_authenticated"
+    },
+    "/_authenticated/roundSummary/$roundId": {
+      "filePath": "_authenticated/roundSummary/$roundId.tsx",
       "parent": "/_authenticated"
     }
   }

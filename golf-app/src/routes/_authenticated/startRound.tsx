@@ -57,13 +57,14 @@ function RouteComponent() {
     try {
       setErrorMessage(null);
 
-      // Create a new round with the current user and selected players
       const response = await createRoundMutation.mutateAsync({
         players: [user!.id, ...selectedPlayers],
       });
 
-      // Navigate to the round in progress page
-      router.navigate({ to: `/rounds/${response.roundId}` });
+      router.navigate({
+        to: `/roundInProgress/$roundId`,
+        params: { roundId: response.roundId },
+      });
     } catch (error) {
       setErrorMessage('Failed to start the round. Please try again.');
     }
@@ -76,9 +77,7 @@ function RouteComponent() {
   return (
     <div className='p-4 bg-gradient-to-r from-green-400 to-green-600 text-white rounded-lg mt-4 mx-2'>
       <h1 className='text-2xl font-bold mb-4'>Start a New Round</h1>
-      <p className='mb-2'>
-        Add 3 friends to the round
-      </p>
+      <p className='mb-2'>Add 3 friends to the round</p>
       <ul className='mb-4'>
         {friends?.friends?.map((friend) => (
           <li key={friend?.friends?.id || 'unknown'}>

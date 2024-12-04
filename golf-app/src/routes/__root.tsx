@@ -40,46 +40,50 @@ function NavBar() {
 
   return (
     <>
-      <div className='p-4 flex gap-4 items-center bg-gradient-to-r from-green-400 to-green-600 text-white'>
-        {user && user.id ? (
-          <>
-            <Link
-              to='/'
-              className='[&.active]:font-bold flex items-center gap-2 hover:underline'
-            >
-              <span>🏠</span>
-              Home
-            </Link>
-            <Link
-              to='/friends'
-              className='[&.active]:font-bold flex items-center gap-2 hover:underline'
-            >
-              <span>👫</span>
-              Friends
-            </Link>
-            <Link
-              to='/rounds'
-              className='[&.active]:font-bold flex items-center gap-2 hover:underline'
-            >
-              <span>⛳</span>
-              Rounds
-            </Link>
-            <Link
-              to='/profile'
-              className='[&.active]:font-bold flex items-center gap-2 hover:underline'
-            >
-              <span>👤</span>
-              Profile
-            </Link>
-          </>
-        ) : (
-          <a
-            href='/api/login'
-            className='font-bold px-4 py-2 bg-white text-green-600 rounded hover:bg-green-100'
-          >
-            Login
-          </a>
-        )}
+      <div className='p-4 flex items-center bg-gradient-to-r from-green-400 to-green-600 text-white md:justify-between lg:p-6 lg:px-28'>
+        <div className='container mx-auto'>
+          {user && user.id ? (
+            <div className='flex justify-evenly'>
+              <Link
+                to='/'
+                className='[&.active]:font-bold flex items-center gap-2 hover:underline'
+              >
+                <span>🏠</span>
+                Home
+              </Link>
+              <Link
+                to='/friends'
+                className='[&.active]:font-bold flex items-center gap-2 hover:underline'
+              >
+                <span>👫</span>
+                Friends
+              </Link>
+              <Link
+                to='/rounds'
+                className='[&.active]:font-bold flex items-center gap-2 hover:underline'
+              >
+                <span>⛳</span>
+                Rounds
+              </Link>
+              <Link
+                to='/profile'
+                className='[&.active]:font-bold flex items-center gap-2 hover:underline'
+              >
+                <span>👤</span>
+                Profile
+              </Link>
+            </div>
+          ) : (
+            <div className='flex justify-center'>
+              <a
+                href='/api/login'
+                className='font-bold px-4 py-2 bg-white text-green-600 rounded hover:bg-green-100 lg:px-6'
+              >
+                Login
+              </a>
+            </div>
+          )}
+        </div>
       </div>
       <hr className='border-green-500' />
     </>

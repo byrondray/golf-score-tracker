@@ -25,7 +25,7 @@ function RouteComponent() {
   } = useQuery(roundDetailsQueryOptions(roundId));
   const [hole, setHole] = useState(1);
   const [scores, setScores] = useState<{ [userId: string]: string }>({});
-  const [partners, setPartners] = useState<string[][]>([]);
+  const [partners, setPartners] = useState<string[][][]>([]);
   const [currentPartnership, setCurrentPartnership] = useState<string[][]>([]);
 
   const updateScoreMutation = useMutation(updateScoreMutationOptions);
@@ -56,7 +56,6 @@ function RouteComponent() {
     if (hole > 1 && hole % 6 === 1) {
       const rotationIndex = Math.floor((hole - 1) / 6) % partners.length;
 
-      // Rotate partnerships every 6 holes
       setCurrentPartnership(partners[rotationIndex]);
     }
   }, [hole, partners]);
@@ -78,7 +77,7 @@ function RouteComponent() {
         (p) => p.totalScore === minScore
       );
 
-      const updatePromises = [];
+      const updatePromises: any[] = [];
       partnershipScores.forEach(({ player1, player2 }) => {
         const isWinner = winningPartnerships.some(
           (p) => p.player1 === player1 || p.player2 === player2
@@ -113,12 +112,6 @@ function RouteComponent() {
       }
     } catch (error) {
       console.error('Error updating scores:', error);
-    }
-  };
-
-  const handlePreviousHole = () => {
-    if (hole > 1) {
-      setHole((prev) => prev - 1);
     }
   };
 

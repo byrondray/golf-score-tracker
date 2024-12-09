@@ -21,15 +21,8 @@ function RouteComponent() {
     router.navigate({ to: '/roundSummary/$roundId', params: { roundId } });
   };
 
-  // Log data for debugging
-  console.log('Loading State:', roundsLoading);
-  console.log('Fetching State:', isFetching);
-  console.log('Rounds Data:', rounds);
-
-  // Safely handle rounds data
   const roundsList = rounds?.rounds ?? [];
 
-  // Ensure "No rounds found" only renders after loading is complete
   if (!roundsLoading && !isFetching && roundsList.length === 0) {
     return (
       <div className='p-4 flex flex-col items-center'>
@@ -46,7 +39,6 @@ function RouteComponent() {
       <div className='w-full max-w-lg'>
         <h1 className='text-2xl font-bold mb-6'>All Rounds</h1>
 
-        {/* Ensure loading state takes precedence */}
         {roundsLoading || isFetching ? (
           <p>Loading rounds...</p>
         ) : roundsError ? (

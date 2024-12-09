@@ -74,7 +74,7 @@ function NavBar() {
               </Link>
             </div>
           ) : (
-            <div className='flex justify-center'>
+            <div className='flex justify-start'>
               <a
                 href='/api/login'
                 className='font-bold px-4 py-2 bg-white text-green-600 rounded hover:bg-green-100 lg:px-6'

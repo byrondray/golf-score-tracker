@@ -140,22 +140,11 @@ export const roundDetailsQueryOptions = (roundId: string) => ({
 export const roundsListQueryOptions = {
   queryKey: ['rounds-list'],
   queryFn: async () => {
-    try {
-      const response = await api.rounds.list.$get();
-      console.log('API Response:', response);
-
-      if (!response.ok) {
-        console.error('API Error Response:', await response.text());
-        throw new Error('Failed to fetch rounds list');
-      }
-
-      const data = await response.json();
-      console.log('Fetched Rounds Data:', data);
-      return data;
-    } catch (error) {
-      console.error('Error fetching rounds list:', error);
-      throw error;
-    }
+    const response = await api.rounds.list.$get();
+    if (!response.ok) throw new Error('Failed to fetch rounds list');
+    return response.json();
   },
-  staleTime: 60000,
+  staleTime: 0,
+  refetchOnWindowFocus: true,
+  refetchOnMount: true,
 };
